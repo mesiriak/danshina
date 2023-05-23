@@ -1,7 +1,17 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"log"
+	"main/pkg"
+)
 
 func main() {
-	fmt.Println("asd")
+	config := GetConfig()
+
+	app := pkg.CreateApp(config)
+
+	appAddr := fmt.Sprintf(":%d", config.AppPort)
+
+	log.Fatal(app.Listen(appAddr))
 }
