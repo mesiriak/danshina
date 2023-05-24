@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"log"
-	"main/pkg"
+	"main/cfg"
+	"main/src"
 )
 
 func main() {
-	config := GetConfig()
+	config := cfg.GetConfig(".")
 
-	app := pkg.CreateApp(config)
+	app := src.CreateApp(config)
 
 	appAddr := fmt.Sprintf(":%d", config.AppPort)
 
