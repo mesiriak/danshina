@@ -12,8 +12,8 @@ import (
 type IMongoClient interface {
 	GetObject(filter interface{}) interface{}
 	GetBulkObject(collection string, limit int, offset int) (*mongo.Cursor, int)
-	CreateObject() interface{}
-	UpdateObject() interface{}
+	CreateObject(collection string, model interface{}) *mongo.SingleResult
+	UpdateObject(collection string, uuid string) *mongo.SingleResult
 	DeleteObject() interface{}
 }
 
@@ -46,7 +46,8 @@ func (mc *Client) GetObject(filter interface{}) interface{} {
 }
 
 func (mc *Client) GetBulkObject(collection string, limit int, offset int) (*mongo.Cursor, int) {
-	response, err := mc.Worker.Database(mc.DBName).Collection(collection).Find(context.TODO(), bson.D{})
+	params := options.Find().SetLimit(int64(limit)).SetSkip(int64(offset))
+	response, err := mc.Worker.Database(mc.DBName).Collection(collection).Find(context.TODO(), bson.D{}, params)
 
 	if err != nil {
 		log.Println("Error happened during getting list of objects")
@@ -59,12 +60,19 @@ func (mc *Client) GetBulkObject(collection string, limit int, offset int) (*mong
 	return response, int(count)
 }
 
-func (mc *Client) CreateObject() interface{} {
-	//TODO implement me
-	panic("implement me")
+func (mc *Client) CreateObject(collection string, model interface{}) *mongo.SingleResult {
+	insertResponse, err := mc.Worker.Database(mc.DBName).Collection(collection).InsertOne(context.TODO(), model)
+
+	if err != nil {
+		log.Println("Error happened during inserting object")
+	}
+
+	response := mc.Worker.Database(mc.DBName).Collection(collection).FindOne(context.TODO(), bson.D{{"_id", insertResponse.InsertedID}})
+
+	return response
 }
 
-func (mc *Client) UpdateObject() interface{} {
+func (mc *Client) UpdateObject(collection string, uuid string) *mongo.SingleResult {
 	//TODO implement me
 	panic("implement me")
 }

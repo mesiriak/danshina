@@ -13,27 +13,27 @@ type BabyService struct {
 	repo *repos.BabyRepo
 }
 
-func (service *BabyService) GetAllBabies() *models.BabyList {
+func (service *BabyService) GetAllBabies(limit int, offset int) *models.BabyListModel {
 
-	return service.repo.GetAllBabies()
+	return service.repo.GetAllBabies(limit, offset)
 }
 
-func (service *BabyService) GetRandomBabies() []*models.Baby {
+func (service *BabyService) GetRandomBabies() []*models.BabyModel {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (service *BabyService) CreateBaby() *models.Baby {
-	//TODO implement me
-	panic("implement me")
+func (service *BabyService) CreateBaby(model *models.BabyModel) *models.BabyModel {
+
+	return service.repo.CreateBaby(model)
 }
 
-func (service *BabyService) UpdateBabyCounter(babyID rune) bool {
-	//TODO implement me
-	panic("implement me")
+func (service *BabyService) UpdateBabyCounter(uuid string) *models.BabyModel {
+
+	return service.UpdateBabyCounter(uuid)
 }
 
-func (service *BabyService) DeleteBaby(babyID rune) bool {
+func (service *BabyService) DeleteBaby(uuid string) bool {
 	//TODO implement me
 	panic("implement me")
 }

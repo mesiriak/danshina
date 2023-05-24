@@ -2,13 +2,25 @@ package handlers
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 	"log"
+	"main/src/adapters/models"
 	"main/src/api/dependencies"
 	"strconv"
 )
 
 func GetAllBabies(ctx *fiber.Ctx) error {
-	response := dependencies.ServerManagerInstance.BabyService.GetAllBabies()
+	// TODO: if statements parsing can be replaced onto QueryModel -> ctx.ParamsParser(out QueryModel{})
+	queryLimit, err := strconv.Atoi(ctx.Params("limit", "10"))
+	if err != nil {
+		log.Fatalf("Error to parse limit parameter.\n%e", err)
+	}
+	queryOffset, err := strconv.Atoi(ctx.Params("offset", "0"))
+	if err != nil {
+		log.Fatalf("Error to parse limit parameter.\n%e", err)
+	}
+
+	response := dependencies.ServerManagerInstance.BabyService.GetAllBabies(queryLimit, queryOffset)
 
 	return ctx.JSON(response)
 }
@@ -20,33 +32,39 @@ func GetRandomBabies(ctx *fiber.Ctx) error {
 }
 
 func CreateBaby(ctx *fiber.Ctx) error {
+	var payload = models.CreateBabyModel{}
+
+	if err := ctx.BodyParser(&payload); err != nil {
+		log.Fatalf("Error happened during body validation.\n%e", err)
+	}
+
 	// TODO: make cdn uploading here
 	//pictureUrl := dependencies.ServerManagerInstance.PictureService
-	response := dependencies.ServerManagerInstance.BabyService.CreateBaby()
+	pictureUrl := "somedummyurl"
+
+	baby := models.BabyModel{
+		Uuid:       uuid.NewString(),
+		Nickname:   payload.Nickname,
+		PictureUrl: pictureUrl,
+	}
+
+	response := dependencies.ServerManagerInstance.BabyService.CreateBaby(&baby)
 
 	return ctx.JSON(response)
 }
 
 func UpdateBabyCounter(ctx *fiber.Ctx) error {
-	babyID, err := strconv.ParseInt(ctx.Params("id"), 10, 32)
+	babyUuid := ctx.Params("uuid")
 
-	if err != nil {
-		log.Println("Error happened during request processing")
-	}
-
-	response := dependencies.ServerManagerInstance.BabyService.UpdateBabyCounter(rune(babyID))
+	response := dependencies.ServerManagerInstance.BabyService.UpdateBabyCounter(babyUuid)
 
 	return ctx.JSON(response)
 }
 
 func DeleteBaby(ctx *fiber.Ctx) error {
-	babyID, err := strconv.ParseInt(ctx.Params("id"), 10, 32)
+	babyUuid := ctx.Params("uuid")
 
-	if err != nil {
-		log.Println("Error happened during request processing")
-	}
-
-	response := dependencies.ServerManagerInstance.BabyService.DeleteBaby(rune(babyID))
+	response := dependencies.ServerManagerInstance.BabyService.DeleteBaby(babyUuid)
 
 	return ctx.JSON(response)
 }

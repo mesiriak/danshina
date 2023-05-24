@@ -15,40 +15,51 @@ type BabyRepo struct {
 	mongoClient mongo.IMongoClient
 }
 
-func (repo *BabyRepo) GetAllBabies() *models.BabyList {
+func (repo *BabyRepo) GetAllBabies(limit int, offset int) *models.BabyListModel {
+	var results []*models.BabyModel
 
-	var response []*models.Baby
+	cursor, count := repo.mongoClient.GetBulkObject("babies", limit, offset)
 
-	cursor, count := repo.mongoClient.GetBulkObject("babies", 0, 0)
-
-	err := cursor.All(context.TODO(), &response)
-
-	if err != nil {
+	if err := cursor.All(context.TODO(), &results); err != nil {
 		log.Fatalf("Error happened during decoding\n%e", err)
 	}
 
-	return &models.BabyList{
+	return &models.BabyListModel{
 		Count:   count,
-		Results: response,
+		Results: results,
 	}
 }
 
-func (repo *BabyRepo) GetRandomBabies() []*models.Baby {
+func (repo *BabyRepo) GetRandomBabies() []*models.BabyModel {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (repo *BabyRepo) CreateBaby() *models.Baby {
-	//TODO implement me
-	panic("implement me")
+func (repo *BabyRepo) CreateBaby(model *models.BabyModel) *models.BabyModel {
+	var results *models.BabyModel
+
+	cursor := repo.mongoClient.CreateObject("babies", model)
+
+	if err := cursor.Decode(&results); err != nil {
+		log.Fatalf("Error happened during decoding\n%e", err)
+	}
+
+	return results
 }
 
-func (repo *BabyRepo) UpdateBabyCounter() bool {
-	//TODO implement me
-	panic("implement me")
+func (repo *BabyRepo) UpdateBabyCounter(uuid string) *models.BabyModel {
+	var results *models.BabyModel
+
+	cursor := repo.mongoClient.UpdateObject("babies", uuid)
+
+	if err := cursor.Decode(&results); err != nil {
+		log.Fatalf("Error happened during decoding\n%e", err)
+	}
+
+	return results
 }
 
-func (repo *BabyRepo) DeleteBaby() bool {
+func (repo *BabyRepo) DeleteBaby(uuid string) bool {
 	//TODO implement me
 	panic("implement me")
 }

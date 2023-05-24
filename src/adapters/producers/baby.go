@@ -3,9 +3,9 @@ package producers
 import "main/src/adapters/models"
 
 type BabyProducer interface {
-	GetAllBabies() *models.BabyList
-	GetRandomBabies() []*models.Baby
-	CreateBaby() *models.Baby
-	UpdateBabyCounter(babyID rune) bool
-	DeleteBaby(babyID rune) bool
+	GetAllBabies(limit int, offset int) *models.BabyListModel
+	GetRandomBabies() []*models.BabyModel
+	CreateBaby(model *models.BabyModel) *models.BabyModel
+	UpdateBabyCounter(uuid string) *models.BabyModel
+	DeleteBaby(uuid string) bool
 }
