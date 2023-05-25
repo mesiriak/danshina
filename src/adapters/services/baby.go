@@ -18,9 +18,9 @@ func (service *BabyService) GetAllBabies(limit int, offset int) *models.BabyList
 	return service.repo.GetAllBabies(limit, offset)
 }
 
-func (service *BabyService) GetRandomBabies() []*models.BabyModel {
-	//TODO implement me
-	panic("implement me")
+func (service *BabyService) GetRandomBabies(size int) *models.BabyRandomListModel {
+
+	return service.repo.GetRandomBabies(size)
 }
 
 func (service *BabyService) CreateBaby(model *models.BabyModel) *models.BabyModel {
@@ -30,7 +30,7 @@ func (service *BabyService) CreateBaby(model *models.BabyModel) *models.BabyMode
 
 func (service *BabyService) UpdateBabyCounter(uuid string) *models.BabyModel {
 
-	return service.UpdateBabyCounter(uuid)
+	return service.repo.UpdateBabyCounter(uuid)
 }
 
 func (service *BabyService) DeleteBaby(uuid string) bool {

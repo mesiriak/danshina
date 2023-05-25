@@ -12,7 +12,9 @@ import (
 type IMongoClient interface {
 	GetObject(filter interface{}) interface{}
 	GetBulkObject(collection string, limit int, offset int) (*mongo.Cursor, int)
+	GetRandomObjects(collection string, size int) (*mongo.Cursor, int)
 	CreateObject(collection string, model interface{}) *mongo.SingleResult
+	UpdateObjectCounter(collection string, uuid string) *mongo.SingleResult
 	UpdateObject(collection string, uuid string) *mongo.SingleResult
 	DeleteObject() interface{}
 }
@@ -41,8 +43,7 @@ func GetMongoClient() IMongoClient {
 }
 
 func (mc *Client) GetObject(filter interface{}) interface{} {
-	//TODO implement me
-	panic("implement me")
+	return nil
 }
 
 func (mc *Client) GetBulkObject(collection string, limit int, offset int) (*mongo.Cursor, int) {
@@ -50,21 +51,32 @@ func (mc *Client) GetBulkObject(collection string, limit int, offset int) (*mong
 	response, err := mc.Worker.Database(mc.DBName).Collection(collection).Find(context.TODO(), bson.D{}, params)
 
 	if err != nil {
-		log.Println("Error happened during getting list of objects")
+		log.Println("Error happened during getting list of objects.")
 	}
 	count, err := mc.Worker.Database(mc.DBName).Collection(collection).CountDocuments(context.TODO(), bson.D{})
 
 	if err != nil {
-		log.Println("Error happened during counting objects")
+		log.Println("Error happened during counting objects.")
 	}
 	return response, int(count)
+}
+
+func (mc *Client) GetRandomObjects(collection string, size int) (*mongo.Cursor, int) {
+	pipeline := []bson.D{{{"$sample", bson.D{{"size", size}}}}}
+	response, err := mc.Worker.Database(mc.DBName).Collection(collection).Aggregate(context.TODO(), pipeline)
+
+	if err != nil {
+		log.Println("Error happened during random objects get.")
+	}
+
+	return response, size
 }
 
 func (mc *Client) CreateObject(collection string, model interface{}) *mongo.SingleResult {
 	insertResponse, err := mc.Worker.Database(mc.DBName).Collection(collection).InsertOne(context.TODO(), model)
 
 	if err != nil {
-		log.Println("Error happened during inserting object")
+		log.Println("Error happened during inserting object.")
 	}
 
 	response := mc.Worker.Database(mc.DBName).Collection(collection).FindOne(context.TODO(), bson.D{{"_id", insertResponse.InsertedID}})
@@ -75,6 +87,16 @@ func (mc *Client) CreateObject(collection string, model interface{}) *mongo.Sing
 func (mc *Client) UpdateObject(collection string, uuid string) *mongo.SingleResult {
 	//TODO implement me
 	panic("implement me")
+}
+
+func (mc *Client) UpdateObjectCounter(collection string, uuid string) *mongo.SingleResult {
+	// TODO: refactor this shitty request
+	response := mc.Worker.Database(mc.DBName).Collection(collection).FindOneAndUpdate(
+		context.TODO(), bson.M{"uuid": uuid}, bson.D{
+			{"$inc", bson.D{{"counter", 1}}},
+		}, options.FindOneAndUpdate().SetReturnDocument(options.After))
+
+	return response
 }
 
 func (mc *Client) DeleteObject() interface{} {

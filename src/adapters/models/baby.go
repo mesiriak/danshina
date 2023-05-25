@@ -12,7 +12,12 @@ type BabyListModel struct {
 	Results []*BabyModel `json:"results"`
 }
 
+type BabyRandomListModel struct {
+	Size    int          `json:"size"`
+	Results []*BabyModel `json:"results"`
+}
+
 type CreateBabyModel struct {
-	Nickname string  `json:"nickname"`
+	Nickname string  `json:"nickname" validate:"required,min=3,max=32"`
 	Picture  []*byte `json:"picture"`
 }

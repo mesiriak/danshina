@@ -11,11 +11,11 @@ import (
 
 func GetAllBabies(ctx *fiber.Ctx) error {
 	// TODO: if statements parsing can be replaced onto QueryModel -> ctx.ParamsParser(out QueryModel{})
-	queryLimit, err := strconv.Atoi(ctx.Params("limit", "10"))
+	queryLimit, err := strconv.Atoi(ctx.Query("limit", "10"))
 	if err != nil {
 		log.Fatalf("Error to parse limit parameter.\n%e", err)
 	}
-	queryOffset, err := strconv.Atoi(ctx.Params("offset", "0"))
+	queryOffset, err := strconv.Atoi(ctx.Query("offset", "0"))
 	if err != nil {
 		log.Fatalf("Error to parse limit parameter.\n%e", err)
 	}
@@ -26,7 +26,13 @@ func GetAllBabies(ctx *fiber.Ctx) error {
 }
 
 func GetRandomBabies(ctx *fiber.Ctx) error {
-	response := dependencies.ServerManagerInstance.BabyService.GetRandomBabies()
+	querySize, err := strconv.Atoi(ctx.Query("size", "2"))
+
+	if err != nil {
+		log.Fatalf("Error to parse size parameter.\n%e", err)
+	}
+
+	response := dependencies.ServerManagerInstance.BabyService.GetRandomBabies(querySize)
 
 	return ctx.JSON(response)
 }
