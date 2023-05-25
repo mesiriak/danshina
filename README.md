@@ -9,4 +9,4 @@ The main target of this project - clicker service.
 * POST `https://host/api/v1/baby/` - create baby. Body `{"nickname": str, "picture": bytearray}`.
 * PATCH `https://host/api/v1/baby/{uuid}` - increment baby counter.
 
-User CDN for pictures - **`Cloudflare`**
+Used CDN for pictures - **`Cloudflare`**
