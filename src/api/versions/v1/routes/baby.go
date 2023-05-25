@@ -6,7 +6,8 @@ import (
 )
 
 func RegisterBabyRoutes(app *fiber.App) {
-	babyGroup := app.Group("/baby")
+	// FIXME: change groups prefix registration
+	babyGroup := app.Group("api/v1/baby")
 
 	babyGroup.Get("/", handlers.GetAllBabies)
 	babyGroup.Get("/random/", handlers.GetRandomBabies)
